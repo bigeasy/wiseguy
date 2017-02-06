@@ -1,0 +1,36 @@
+{
+    "name":                 "wiseguy",
+    "version":              "0.0.0",
+    "description":
+
+      "Development utilities for Node.js written in `bash`.",
+
+    "keywords":
+    [
+                            "async", "asynchronous", "control", "flow", "loop",
+                            "micro-js", "step", "callback"
+    ],
+    "author":               "Alan Gutierrez <alan@prettyrobots.com>",
+    "homepage":             "http://bigeasy.github.com/wiseguy",
+    "bugs":                 "http://bigeasy.github.com/wiseguy/issues",
+    "license":              "MIT",
+    "repository":
+    {
+                            "url": "git://github.com/bigeasy/wiseguy.git",
+                            "type": "git"
+    },
+    "dependencies":
+    {
+    },
+    "devDependencies":
+    {
+    },
+    "bin":
+    {
+                            "wg":                        "wiseguy.bash"
+    },
+    "scripts":
+    {
+                            "test": "proof platform win32 && proof test */*.t.js || t/test"
+    }
+}
