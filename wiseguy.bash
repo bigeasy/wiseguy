@@ -2,12 +2,12 @@
 
 set -e
 
-case "$OSTYPE" in
-    darwin* )
-        homeport_host_os=OSX
+case "$(uname)" in
+    Darwin* )
+        wiseguy_host_os=OSX
         ;;
     linux* )
-        homeport_host_os=Linux
+        wiseguy_host_os=Linux
         ;;
     * )
         abend "Homeport will only run on OS X or Linux."
