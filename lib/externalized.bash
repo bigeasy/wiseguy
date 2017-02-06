@@ -34,7 +34,7 @@ function wiseguy_exec () {
 
     shift
 
-    export homeport_path homeport_docker_hub_account homeport_unix_user \
+    export wiseguy_path homeport_docker_hub_account homeport_unix_user \
         homeport_tag homeport_image homeport_unix_user \
         homeport_home_container homeport_evaluated homeport_container \
         homeport_formula_path homeport_host_os
