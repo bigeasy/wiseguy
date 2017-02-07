@@ -14,4 +14,5 @@ pushd "$wiseguy_path/../.." > /dev/null
 project_path=$(pwd)
 popd > /dev/null
 
-make -C "$project_path" -f "$wiseguy_path/Makefile" "$@"
+#make -C "$project_path" -f "$wiseguy_path/Makefile" "$@"
+make -f "$wiseguy_path/Makefile" "$@"

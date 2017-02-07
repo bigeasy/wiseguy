@@ -43,41 +43,56 @@ export CHROME_REFRESH
 PATH  := "$(PATH):$(PWD)/node_modules/.bin"
 SHELL := env PATH=$(PATH) /bin/sh
 
+name := $(shell jq -r '.name' < package.json)
+
+ifneq (,$(findstring .,$(name)))
+	name := $(shell echo $(name) | sed 's/.*\.//')
+	root := ..
+	docs := $(root)/docs/$(name)
+	temp := $(root)/.wiseguy/$(name)
+else
+	root := .
+	docs := $(root)/docs
+	temp := $(root)/.wiseguy/_root
+endif
+
 javascript := $(filter-out _%, $(wildcard *.js))
-sources := $(patsubst %.js,.wiseguy/source/%.js.js,$(javascript))
-docco := $(patsubst .wiseguy/source/%.js.js,docs/docco/%.js.html,$(sources))
+sources := $(patsubst %.js,$(temp)/source/%.js.js,$(javascript))
+docco := $(patsubst $(temp)/source/%.js.js,$(docs)/docco/%.js.html,$(sources))
 pages :=
 ifneq (,$(docco))
 pages += docs/docco/index.html
 endif
 outputs := $(docco) docs/css/style.css docs/index.html $(pages)
 
-all: $(outputs)
-	@echo $(outputs)
+all: $(root)/docs $(docco) $(docs)/index.html
 
-docs:
+$(root)/docs:
 	@ \
 	origin=$$(git config --get remote.origin.url); \
 	echo "$$origin"; \
-	git clone -b gh-pages --recursive "$$origin" docs;
+	git clone -b gh-pages --recursive "$$origin" $(root)/docs;
 
-node_modules/.bin/docco:
-	mkdir -p node_modules
-	npm install docco@0.7.0
-	cd node_modules && patch -p 1 < wiseguy/docco.js.patch
+$(root)/node_modules/.bin/docco:
+	cd $(root); \
+	mkdir -p node_modules; \
+	npm install docco@0.7.0; \
+	cd node_modules && patch -p 1 < wiseguy/docco.js.patch;
 
-node_modules/.bin/serve:
-	mkdir -p node_modules
-	npm install serve@1.4.0
+$(root)/node_modules/.bin/serve:
+	cd $(root); \
+	mkdir -p node_modules; \
+	npm install serve@1.4.0;
 
-node_modules/.bin/lessc:
-	mkdir -p node_modules
-	npm install less
+$(root)/node_modules/.bin/lessc:
+	cd $(root); \
+	mkdir -p node_modules; \
+	npm install less;
 
-node_modules/.bin/edify:
-	mkdir -p node_modules
-	npm install less edify edify.pug edify.markdown edify.highlight edify.include edify.ls
-
+$(root)/node_modules/.bin/edify:
+	cd $(root); \
+	mkdir -p node_modules; \
+	npm install less edify edify.pug edify.markdown edify.highlight edify.include edify.ls;
 
 # Thoughts on how to capture a child pid.
 #
@@ -123,121 +138,36 @@ watch: all
 		fi \
 	done;
 
-docs/css/%.css: docs/css/%.less node_modules/.bin/lessc
-	node_modules/.bin/lessc $< > $@ || rm -f $@
+$(root)/$(docs)/css/%.css: $(root)/$(docs)/css/%.less $(root)/node_modules/.bin/lessc
+	$(root)/node_modules/.bin/lessc $< > $@ || rm -f $@
 
-.wiseguy/source/%.js.js: %.js
-	mkdir -p .wiseguy/source
+$(temp)/source/%.js.js: %.js
+	mkdir -p $(temp)/source
 	cp $< $@
 
-$(docco): $(sources) node_modules/.bin/docco
+$(docco): $(sources) $(root)/node_modules/.bin/docco
 	echo $(docco) $(sources)
 	mkdir -p docco
-	node_modules/.bin/docco -o docs/docco -c node_modules/wiseguy/docco.css .wiseguy/source/*.js.js
-	sed -i '' -e 's/[ \t]*$$//' docs/docco/*.js.html
-	sed -i '' -e 's/\.js\.js/.js/' docs/docco/*.js.html
+	$(root)/node_modules/.bin/docco -o $(docs)/docco -c $(root)/node_modules/wiseguy/docco.css $(temp)/source/*.js.js
+	sed -i '' -e 's/[ \t]*$$//' $(docs)/docco/*.js.html
+	sed -i '' -e 's/\.js\.js/.js/' $(docs)/docco/*.js.html
 
-docs/index.html: docs/index.md
+$(docs)/index.html: $(docs)/index.md
 
 ifneq (,$(docco))
 docs/docco/index.html: node_modules/wiseguy/docco.pug $(docco)
 	node node_modules/.bin/edify pug $$(node_modules/.bin/edify ls docs/docco) < $< > $@
 endif
 
-docs/%.html: docs/pages/%.pug node_modules/.bin/edify
+$(docs)/%.html: $(docs)/pages/%.pug $(root)/node_modules/.bin/edify
 	@echo generating $@
-	@(node node_modules/.bin/edify pug | \
-		node_modules/.bin/edify include --select '.include' --type text | \
-	    node node_modules/.bin/edify markdown --select '.markdown' | \
-	    node node_modules/.bin/edify highlight --select '.lang-javascript' --language 'javascript') < $< > $@
+	@(cd $(docs) && $(root)/../node_modules/.bin/edify pug | \
+		$(root)/../node_modules/.bin/edify include --select '.include' --type text | \
+	    $(root)/../node_modules/.bin/edify markdown --select '.markdown' | \
+	    $(root)/../node_modules/.bin/edify highlight --select '.lang-javascript' --language 'javascript') < $< > $@
 
 clean:
-	rm -f $(outputs) $(pages) docco/*.html
+	rm -f $(docco) $(docs)/index.html $(docs)/docco/*.html
 
 serve: node_modules/.bin/serve all
 	(cd docs && ../node_modules/.bin/serve --no-less --port 4000)
-
-pull-specific:
-	@ \
-	pwd=$$(pwd); \
-	if [ -e "$$pwd"/.gitmodules ]; then \
-		tail=$$( \
-			git config -f "$$pwd"/.gitmodules -l | \
-				sed -n 's/submodule\.\(.*\)\.branch/\1/p' | \
-				tail -n 1 \
-		); \
-		if [ ! -z "$$tail" ]; then \
-			IFS='=' read -a pair <<< "$$tail"; \
-			echo make -C "$$pwd"/"$${pair[0]}" pull; \
-			make -C "$$pwd"/"$${pair[0]}" pull; \
-		fi; \
-	fi; \
-	echo git -C "$$pwd" pull; \
-	git -C "$$pwd" pull;
-
-pull: pull-specific
-	@ \
-	pwd=$$(pwd); \
-	dir=$$(cd .. && pwd); \
-	path=$$(basename $$(pwd)); \
-	while ! [ -e "$$dir"/.gitmodules ]; do \
-		path=$$(basename "$$dir")/$$path; \
-		dir=$$(cd "$$dir" && cd .. && pwd); \
-	done; \
-	git config -f "$$dir"/.gitmodules -l | \
-		sed -n 's/submodule\.\(.*\)\.branch/\1/p' | \
-    while read -r line; do \
-		IFS='=' read -a pair <<< "$$line"; \
-		if [ "$$dir"/"$${pair[0]}" != "$$pwd" ]; then \
-			echo make -C "$$dir"/"$${pair[0]}" pull-specific; \
-			make -C "$$dir"/"$${pair[0]}" pull-specific; \
-		fi \
-	done
-
-tracking-specific:
-	@ \
-	pwd=$$(pwd); \
-	if [ -e "$$pwd"/.gitmodules ]; then \
-		tail=$$( \
-			git config -f "$$pwd"/.gitmodules -l | \
-				sed -n 's/submodule\.\(.*\)\.branch/\1/p' | \
-				tail -n 1 \
-		); \
-		if [ ! -z "$$tail" ]; then \
-			IFS='=' read -a pair <<< "$$tail"; \
-			echo make -C "$$pwd"/"$${pair[0]}" tracking; \
-			make -C "$$pwd"/"$${pair[0]}" tracking; \
-		fi; \
-	fi; \
-	dir=$$(cd .. && pwd); \
-	path=$$(basename $$(pwd)); \
-	while ! [ -e "$$dir"/.gitmodules ]; do \
-		path=$$(basename "$$dir")/$$path; \
-		dir=$$(cd "$$dir" && cd .. && pwd); \
-	done; \
-	branch=$$(git config -f "$$dir"/.gitmodules submodule.$$path.branch); \
-	[ -z "$$branch" ] && echo no branch && exit 1; \
-	echo git -C "$$pwd" checkout $$branch; \
-	git -C "$$pwd" checkout $$branch; \
-	echo git branch -C "$$pwd" --set-upstream-to=origin/$$branch; \
-	git -C "$$pwd" branch --set-upstream-to=origin/$$branch;
-
-tracking: tracking-specific
-	@ pwd=$$(pwd); \
-	dir=$$(cd .. && pwd); \
-	path=$$(basename $$(pwd)); \
-	while ! [ -e "$$dir"/.gitmodules ]; do \
-		path=$$(basename "$$dir")/$$path; \
-		dir=$$(cd "$$dir" && cd .. && pwd); \
-	done; \
-	git config -f "$$dir"/.gitmodules -l | \
-		sed -n 's/submodule\.\(.*\)\.branch/\1/p' | \
-    while read -r line; do \
-		IFS='=' read -a pair <<< "$$line"; \
-		if [ "$$dir"/"$${pair[0]}" != "$$pwd" ]; then \
-			echo make -C "$$dir"/"$${pair[0]}" tracking-specific; \
-			make -C "$$dir"/"$${pair[0]}" tracking-specific; \
-		fi \
-	done
-
-.INTERMEDIATE: $(sources)
