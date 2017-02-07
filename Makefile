@@ -50,10 +50,12 @@ ifneq (,$(findstring .,$(name)))
 	root := ..
 	docs := $(root)/docs/$(name)
 	temp := $(root)/.wiseguy/$(name)
+	wiseguy := $(root)/node_modules/wiseguy
 else
 	root := .
 	docs := $(root)/docs
 	temp := $(root)/.wiseguy/_root
+	wiseguy := $(root)/node_modules/wiseguy
 endif
 
 javascript := $(filter-out _%, $(wildcard *.js))
@@ -113,12 +115,12 @@ $(root)/node_modules/.bin/edify:
 # background,  if I where to allow myself a few pid files in the build
 # directory.
 up:
-	{ make --no-print-directory serve & } && serve=$$!; \
-	make --no-print-directory watch; \
+	{ make -f $(wiseguy)/Makefile --no-print-directory serve & } && serve=$$!; \
+	make -f $(wiseguy)/Makefile --no-print-directory watch; \
 	kill -TERM $$serve;
 
 down:
-	touch Makefile
+	touch .wiseguy/_watch
 
 # Would have to redirect too much.
 #	$(eval foo=$(shell echo 8))
@@ -127,14 +129,16 @@ down:
 #	echo -> $(serve)
 
 watch: all
-	fswatch --exclude '.' --include 'Makefile$$' --include '\.pug$$' --include '\.less$$' --include '\.md$$' --include '\.js$$' pages css $(javascript) *.md Makefile | while read line; \
+	mkdir -p .wiseguy
+	touch .wiseguy/_watch
+	fswatch --exclude '.' --include '.wiseguy/_watch$$' --include '\.pug$$' --include '\.less$$' --include '\.md$$' --include '\.js$$' pages css $(javascript) *.md Makefile | while read line; \
 	do \
 		echo OUT-OF-DATE: $$line; \
-		if [[ $$line == *Makefile ]]; then \
-			touch Makefile; \
+		if [[ $$line == *_watch ]]; then \
+			touch .wiseguy/_watch; \
 			exit 0; \
 		else \
-			make --no-print-directory all < /dev/null; \
+			make -f "$(wiseguy)/Makefile" --no-print-directory all < /dev/null; \
 			osascript -e "$$CHROME_REFRESH"; \
 		fi \
 	done;
