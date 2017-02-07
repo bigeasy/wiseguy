@@ -62,11 +62,11 @@ styles := $(patsubst $(docs)/css/%.less,$(docs)/css/%.css,$(wildcard $(docs)/css
 docco := $(patsubst $(temp)/source/%.js.js,$(docs)/docco/%.js.html,$(sources))
 pages :=
 ifneq (,$(docco))
-pages += docs/docco/index.html
+pages += $(docs)/docco/index.html
 endif
-outputs := $(docco) $(styles) docs/index.html $(pages)
+outputs := $(root)/docs $(docco) $(docs)/index.html $(pages)
 
-all: $(root)/docs $(docco) $(docs)/index.html
+all: $(outputs)
 
 $(root)/docs:
 	@ \
@@ -155,10 +155,8 @@ $(docco): $(sources) $(root)/node_modules/.bin/docco
 
 $(docs)/index.html: $(docs)/index.md
 
-ifneq (,$(docco))
-docs/docco/index.html: node_modules/wiseguy/docco.pug $(docco)
-	node node_modules/.bin/edify pug $$(node_modules/.bin/edify ls docs/docco) < $< > $@
-endif
+$(docs)/docco/index.html: $(root)/node_modules/wiseguy/docco.pug $(docco)
+	$(root)/node_modules/.bin/edify pug $$($(root)/node_modules/.bin/edify ls $(docs)/docco) < $< > $@
 
 $(docs)/%.html: $(docs)/pages/%.pug $(root)/node_modules/.bin/edify
 	@echo generating $@
@@ -170,5 +168,5 @@ $(docs)/%.html: $(docs)/pages/%.pug $(root)/node_modules/.bin/edify
 clean:
 	rm -f $(docco) $(docs)/index.html $(docs)/docco/*.html
 
-serve: node_modules/.bin/serve all
-	(cd docs && ../node_modules/.bin/serve --no-less --port 4000)
+serve: $(root)/node_modules/.bin/serve all
+	(cd $(root)/docs && ../node_modules/.bin/serve --no-less --port 4000)
