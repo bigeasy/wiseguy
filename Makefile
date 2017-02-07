@@ -58,12 +58,13 @@ endif
 
 javascript := $(filter-out _%, $(wildcard *.js))
 sources := $(patsubst %.js,$(temp)/source/%.js.js,$(javascript))
+styles := $(patsubst $(docs)/css/%.less,$(docs)/css/%.css,$(wildcard $(docs)/css))
 docco := $(patsubst $(temp)/source/%.js.js,$(docs)/docco/%.js.html,$(sources))
 pages :=
 ifneq (,$(docco))
 pages += docs/docco/index.html
 endif
-outputs := $(docco) docs/css/style.css docs/index.html $(pages)
+outputs := $(docco) $(styles) docs/index.html $(pages)
 
 all: $(root)/docs $(docco) $(docs)/index.html
 
