@@ -14,5 +14,18 @@ pushd "$wiseguy_path/../.." > /dev/null
 project_path=$(pwd)
 popd > /dev/null
 
-#make -C "$project_path" -f "$wiseguy_path/Makefile" "$@"
+name=$(jq -r '.name' < package.json)
+
+WISEGUY_SUBPROJECT_NAME=
+if [[ "$name" = *.* ]]; then
+	WISEGUY_SUBPROJECT_NAME=${name#*.}
+elif [ -e "../package.json" ]; then
+	parent=$(jq -r '.name' < "../package.json")
+	if [ "$parent" = "$name" ]; then
+        WISEGUY_SUBPROJECT_NAME=root
+    fi
+fi
+
+export WISEGUY_SUBPROJECT_NAME
+
 make -f "$wiseguy_path/Makefile" "$@"

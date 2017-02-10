@@ -43,13 +43,10 @@ export CHROME_REFRESH
 PATH  := "$(PATH):$(PWD)/node_modules/.bin"
 SHELL := env PATH=$(PATH) /bin/sh
 
-name := $(shell jq -r '.name' < package.json)
-
-ifneq (,$(findstring .,$(name)))
-	name := $(shell echo $(name) | sed 's/.*\.//')
+ifneq ($(WISEGUY_SUBPROJECT_NAME),)
 	root := ..
-	docs := $(root)/docs/$(name)
-	temp := $(root)/.wiseguy/$(name)
+	docs := $(root)/docs/$(WISEGUY_SUBPROJECT_NAME)
+	temp := $(root)/.wiseguy/$(WISEGUY_SUBPROJECT_NAME)
 	wiseguy := $(root)/node_modules/wiseguy
 else
 	root := .
@@ -60,15 +57,18 @@ endif
 
 javascript := $(filter-out _%, $(wildcard *.js))
 sources := $(patsubst %.js,$(temp)/source/%.js.js,$(javascript))
-styles := $(patsubst $(docs)/css/%.less,$(docs)/css/%.css,$(wildcard $(docs)/css))
+styles := $(patsubst $(docs)/css/%.less,$(docs)/css/%.css,$(wildcard $(docs)/css/*.less))
 docco := $(patsubst $(temp)/source/%.js.js,$(docs)/docco/%.js.html,$(sources))
 pages :=
 ifneq (,$(docco))
 pages += $(docs)/docco/index.html
 endif
-outputs := $(root)/docs $(docco) $(docs)/index.html $(pages)
+outputs := $(docco) $(docs)/index.html $(pages) $(styles)
 
-all: $(outputs)
+all: $(root)/docs $(outputs)
+
+inspect:
+	@echo project=$(WISEGUY_SUBPROJECT_NAME)\; root=$(root)\;
 
 $(root)/docs:
 	@ \
@@ -79,13 +79,18 @@ $(root)/docs:
 $(root)/node_modules/.bin/docco:
 	cd $(root); \
 	mkdir -p node_modules; \
-	npm install docco@0.7.0; \
-	cd node_modules && patch -p 1 < wiseguy/docco.js.patch;
+	npm install docco@0.7.0;
 
+#	cd node_modules && patch -p 1 < wiseguy/docco.js.patch;
 $(root)/node_modules/.bin/serve:
 	cd $(root); \
 	mkdir -p node_modules; \
 	npm install serve@1.4.0;
+
+$(root)/node_modules/.bin/istanbul:
+	cd $(root); \
+	mkdir -p node_modules; \
+	npm install istanbul;
 
 $(root)/node_modules/.bin/lessc:
 	cd $(root); \
@@ -120,7 +125,7 @@ up:
 	kill -TERM $$serve;
 
 down:
-	touch .wiseguy/_watch
+	touch $(root)/.wiseguy/_watch
 
 # Would have to redirect too much.
 #	$(eval foo=$(shell echo 8))
@@ -129,8 +134,9 @@ down:
 #	echo -> $(serve)
 
 watch: all
-	mkdir -p .wiseguy
-	touch .wiseguy/_watch
+	cd $(root); \
+	mkdir -p .wiseguy; \
+	touch .wiseguy/_watch; \
 	fswatch --exclude '.' --include '.wiseguy/_watch$$' --include '\.pug$$' --include '\.less$$' --include '\.md$$' --include '\.js$$' pages css $(javascript) *.md Makefile | while read line; \
 	do \
 		echo OUT-OF-DATE: $$line; \
@@ -143,7 +149,7 @@ watch: all
 		fi \
 	done;
 
-$(root)/$(docs)/css/%.css: $(root)/$(docs)/css/%.less $(root)/node_modules/.bin/lessc
+$(docs)/css/%.css: $(docs)/css/%.less $(root)/node_modules/.bin/lessc
 	$(root)/node_modules/.bin/lessc $< > $@ || rm -f $@
 
 $(temp)/source/%.js.js: %.js
@@ -152,9 +158,9 @@ $(temp)/source/%.js.js: %.js
 
 $(docco): $(sources) $(root)/node_modules/.bin/docco
 	echo $(docco) $(sources)
-	mkdir -p docco
+	mkdir -p $(docs)/docco
 	$(root)/node_modules/.bin/docco -o $(docs)/docco -c $(root)/node_modules/wiseguy/docco.css $(temp)/source/*.js.js
-	sed -i '' -e 's/[ \t]*$$//' $(docs)/docco/*.js.html
+	sed -i '' -e 's/[[:space:]]*$$//' $(docs)/docco/*.js.html
 	sed -i '' -e 's/\.js\.js/.js/' $(docs)/docco/*.js.html
 
 $(docs)/index.html: $(docs)/index.md
@@ -170,7 +176,10 @@ $(docs)/%.html: $(docs)/pages/%.pug $(root)/node_modules/.bin/edify
 	    $(root)/../node_modules/.bin/edify highlight --select '.lang-javascript' --language 'javascript') < $< > $@
 
 clean:
-	rm -f $(docco) $(docs)/index.html $(docs)/docco/*.html
+	rm -f $(outputs) $(docs)/index.html $(docs)/docco/*.html
 
 serve: $(root)/node_modules/.bin/serve all
 	(cd $(root)/docs && ../node_modules/.bin/serve --no-less --port 4000)
+
+cover: $(root)/node_modules/.bin/istanbul all
+
