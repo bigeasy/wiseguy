@@ -1,96 +1,35 @@
 {
-  "_args": [
+    "name":                 "wiseguy",
+    "version":              "0.0.4",
+    "description":
+
+      "Development utilities for Node.js written in `bash`.",
+
+    "keywords":
     [
-      {
-        "raw": "wiseguy",
-        "scope": null,
-        "escapedName": "wiseguy",
-        "name": "wiseguy",
-        "rawSpec": "",
-        "spec": "latest",
-        "type": "tag"
-      },
-      "/Users/alan/git/ecma/consensus/mingle"
-    ]
-  ],
-  "_from": "wiseguy@latest",
-  "_id": "wiseguy@0.0.0",
-  "_inCache": true,
-  "_location": "/wiseguy",
-  "_nodeVersion": "4.7.2",
-  "_npmOperationalInternal": {
-    "host": "packages-12-west.internal.npmjs.com",
-    "tmp": "tmp/wiseguy-0.0.0.tgz_1486414383285_0.5824503568001091"
-  },
-  "_npmUser": {
-    "name": "bigeasy",
-    "email": "alan@prettyrobots.com"
-  },
-  "_npmVersion": "4.0.5",
-  "_phantomChildren": {},
-  "_requested": {
-    "raw": "wiseguy",
-    "scope": null,
-    "escapedName": "wiseguy",
-    "name": "wiseguy",
-    "rawSpec": "",
-    "spec": "latest",
-    "type": "tag"
-  },
-  "_requiredBy": [
-    "#USER"
-  ],
-  "_resolved": "https://registry.npmjs.org/wiseguy/-/wiseguy-0.0.0.tgz",
-  "_shasum": "ace12dd711a0fb49d2edff8b6c2a9a18fac19472",
-  "_shrinkwrap": null,
-  "_spec": "wiseguy",
-  "_where": "/Users/alan/git/ecma/consensus/mingle",
-  "author": {
-    "name": "Alan Gutierrez",
-    "email": "alan@prettyrobots.com"
-  },
-  "bin": {
-    "wg": "wiseguy.bash"
-  },
-  "bugs": {
-    "url": "http://bigeasy.github.com/wiseguy/issues"
-  },
-  "dependencies": {},
-  "description": "Development utilities for Node.js written in `bash`.",
-  "devDependencies": {},
-  "directories": {},
-  "dist": {
-    "shasum": "ace12dd711a0fb49d2edff8b6c2a9a18fac19472",
-    "tarball": "https://registry.npmjs.org/wiseguy/-/wiseguy-0.0.0.tgz"
-  },
-  "gitHead": "a6eb0911aa25840ed7bd57cb9c13dfd7fc3bf46c",
-  "homepage": "http://bigeasy.github.com/wiseguy",
-  "keywords": [
-    "async",
-    "asynchronous",
-    "control",
-    "flow",
-    "loop",
-    "micro-js",
-    "step",
-    "callback"
-  ],
-  "license": "MIT",
-  "maintainers": [
+                            "comparator", "sort"
+    ],
+    "author":               "Alan Gutierrez <alan@prettyrobots.com>",
+    "homepage":             "https://github.com/bigeasy/wiseguy",
+    "bugs":                 "https://github.com/bigeasy/wiseguy/issues",
+    "license":              "MIT",
+    "repository":
     {
-      "name": "bigeasy",
-      "email": "alan@prettyrobots.com"
+                            "type": "git",
+                            "url": "http://github.com/bigeasy/wiseguy.git"
+    },
+    "dependencies":
+    {
+    },
+    "devDependencies":
+    {
+    },
+    "bin":
+    {
+                            "wg": "wiseguy.bash"
+    },
+    "scripts":
+    {
+                            "test": "proof platform win32 && proof test */*.t.js || t/test"
     }
-  ],
-  "name": "wiseguy",
-  "optionalDependencies": {},
-  "readme": "ERROR: No README data found!",
-  "repository": {
-    "url": "git://github.com/bigeasy/wiseguy.git",
-    "type": "git"
-  },
-  "scripts": {
-    "test": "proof platform win32 && proof test */*.t.js || t/test"
-  },
-  "version": "0.0.4"
 }
