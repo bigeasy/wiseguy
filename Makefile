@@ -63,7 +63,7 @@ pages :=
 ifneq (,$(docco))
 pages += $(docs)/docco/index.html
 endif
-outputs := $(docco) $(docs)/index.html $(pages) $(styles)
+outputs := $(docco) $(docs)/index.html $(pages) $(styles) $(docs)/interface.html
 
 all: $(root)/docs $(outputs)
 
@@ -137,7 +137,7 @@ watch: all
 	cd $(root); \
 	mkdir -p .wiseguy; \
 	touch .wiseguy/_watch; \
-	fswatch --exclude '.' --include '.wiseguy/_watch$$' --include '\.pug$$' --include '\.less$$' --include '\.md$$' --include '\.js$$' pages css $(javascript) *.md Makefile | while read line; \
+	fswatch --exclude '.' --include '../.wiseguy/_watch$$' --include '\.yml$$' --include '\.pug$$' --include '\.less$$' --include '\.md$$' --include '\.js$$' docs/*.yml node_modules/wiseguy/*.pug docs/pages docs/css $(javascript) docs/*.md Makefile | while read line; \
 	do \
 		echo OUT-OF-DATE: $$line; \
 		if [[ $$line == *_watch ]]; then \
@@ -174,6 +174,14 @@ $(docs)/%.html: $(docs)/pages/%.pug $(root)/node_modules/.bin/edify
 		$(root)/../node_modules/.bin/edify include --select '.include' --type text | \
 	    $(root)/../node_modules/.bin/edify markdown --select '.markdown' | \
 	    $(root)/../node_modules/.bin/edify highlight --select '.lang-javascript' --language 'javascript') < $< > $@
+
+$(root)/node_modules/.bin/yaml2json:
+	npm install yamljs
+
+$(docs)/interface.html: $(docs)/interface.yml $(wiseguy)/interface.pug $(root)/node_modules/.bin/yaml2json $(root)/node_modules/.bin/edify
+	($(root)/node_modules/.bin/edify pug "$$(node_modules/.bin/yaml2json $<)" | \
+	    $(root)/node_modules/.bin/edify markdown --select '.markdown' | \
+	    $(root)/node_modules/.bin/edify highlight --select '.lang-javascript' --language 'javascript') < $(wiseguy)/interface.pug > $@
 
 clean:
 	rm -f $(outputs) $(docs)/index.html $(docs)/docco/*.html
