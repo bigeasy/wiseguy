@@ -41,7 +41,8 @@ export SAFARI_REFRESH
 export CHROME_REFRESH
 
 PATH  := "$(PATH):$(PWD)/node_modules/.bin"
-SHELL := env PATH=$(PATH) /bin/sh
+# Need to both set path and use `bash` explicitly.
+SHELL := env PATH=$(PATH) /bin/bash
 
 ifneq ($(WISEGUY_SUBPROJECT_NAME),)
 	root := ..
@@ -63,7 +64,15 @@ pages :=
 ifneq (,$(docco))
 pages += $(docs)/docco/index.html
 endif
-outputs := $(docco) $(docs)/index.html $(pages) $(styles) $(docs)/interface.html
+outputs := $(docco) $(docs)/index.html $(pages) $(styles)
+
+ifneq ("$(wildcard $(docs)/interface.yml)","")
+outputs += $(docs)/interface.html
+endif
+
+ifneq ("$(wildcard $(docs)/diary.md)","")
+outputs += $(docs)/diary.html
+endif
 
 all: $(root)/docs $(outputs)
 
@@ -174,6 +183,14 @@ $(docs)/%.html: $(docs)/pages/%.pug $(root)/node_modules/.bin/edify
 		$(root)/../node_modules/.bin/edify include --select '.include' --type text | \
 	    $(root)/../node_modules/.bin/edify markdown --select '.markdown' | \
 	    $(root)/../node_modules/.bin/edify highlight --select '.lang-javascript' --language 'javascript') < $< > $@
+
+$(docs)/diary.html: $(docs)/diary.md $(docs)/pages/diary.pug $(root)/node_modules/.bin/edify
+	@echo generating $@
+	@(cd $(docs) && $(root)/../node_modules/.bin/edify pug <($(root)/../node_modules/.bin/wg diary < diary.md | jq -s .) | \
+		$(root)/../node_modules/.bin/edify include --select '.include' --type text | \
+	    $(root)/../node_modules/.bin/edify markdown --select '.markdown' | \
+	    $(root)/../node_modules/.bin/edify highlight --select '.lang-javascript' --language 'javascript' \
+		) < $(docs)/pages/diary.pug > $@
 
 $(root)/node_modules/.bin/yaml2json:
 	npm install yamljs
