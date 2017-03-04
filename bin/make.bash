@@ -7,7 +7,7 @@ homeport module <<usage
 
     description:
 
-        Create something form the Wiseguy Makefile.
+        Create something from the Wiseguy Makefile.
 usage
 
 pushd "$wiseguy_path/../.." > /dev/null
