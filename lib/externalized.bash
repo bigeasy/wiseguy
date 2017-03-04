@@ -37,7 +37,7 @@ function wiseguy_exec () {
     export wiseguy_path homeport_docker_hub_account homeport_unix_user \
         homeport_tag homeport_image homeport_unix_user \
         homeport_home_container homeport_evaluated homeport_container \
-        homeport_formula_path homeport_host_os
+        homeport_formula_path wiseguy_host_os
     export homeport_command_path="$action" homeport_namespace
     export -f getopt usage abend homeport \
         wiseguy_exec homeport_emit_evaluated homeport_emit_evaluated_variable \
