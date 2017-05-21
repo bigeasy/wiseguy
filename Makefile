@@ -88,9 +88,9 @@ $(root)/docs:
 $(root)/node_modules/.bin/docco:
 	cd $(root); \
 	mkdir -p node_modules; \
-	npm install docco@0.7.0;
+	npm install docco@0.7.0; \
+	cd node_modules && patch -p 1 < wiseguy/docco.js.patch;
 
-#	cd node_modules && patch -p 1 < wiseguy/docco.js.patch;
 $(root)/node_modules/.bin/serve:
 	cd $(root); \
 	mkdir -p node_modules; \
