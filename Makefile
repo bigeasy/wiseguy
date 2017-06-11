@@ -201,7 +201,7 @@ $(docs)/interface.html: $(docs)/interface.yml $(wiseguy)/interface.pug $(root)/n
 	    $(root)/node_modules/.bin/edify highlight --select '.lang-javascript' --language 'javascript') < $(wiseguy)/interface.pug > $@
 
 clean:
-	rm -rf $(outputs) $(docs)/index.html $(docs)/docco
+	rm -rf $(outputs) $(docs)/index.html $(docs)/docco .wiseguy
 
 serve: $(root)/node_modules/.bin/serve all
 	(cd $(root)/docs && ../node_modules/.bin/serve --no-less --port 4000)
