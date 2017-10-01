@@ -34,7 +34,7 @@ while read line; do
         if [ "$wiseguy_host_os" = "Linux" ]; then
             date=$(date --date="$date" +%s)
         else
-            date=$(date -j -f "%a %b %d %T %Z %Y" "$date" "+%s")
+            date=$(gdate --date="$date" +%s)
         fi
     else
         body+="$line"$'\n'

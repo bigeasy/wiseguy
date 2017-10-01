@@ -21,10 +21,10 @@ while read line; do
         if [ "$wiseguy_host_os" = "Linux" ]; then
             date=$(date --date="$date" +%s)
         else
-            date=$(date -j -f "%a %b %d %T %Z %Y" "$date" "+%s")
+            date=$(gdate --date="$date" +%s)
         fi
         file=$(date -j -f '%s' "$date" +%Y-%m).diary.md
-        if [ ! -e $output/$file ] || [ $started -ot $output/$file ]; then
+        if [[ ! -e $output/$file ]] || [[ $output/$file -ot $started ]]; then
             mkdir -p $output
             rm -f $output/$file
         fi
