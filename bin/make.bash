@@ -27,5 +27,6 @@ elif [ -e "../package.json" ]; then
 fi
 
 export WISEGUY_SUBPROJECT_NAME
+export WISEGUY_PATH=$wiseguy_path
 
 make -f "$wiseguy_path/Makefile" "$@"
