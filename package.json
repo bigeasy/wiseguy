@@ -27,9 +27,5 @@
     "bin":
     {
                             "wg": "wiseguy.bash"
-    },
-    "scripts":
-    {
-                            "test": "proof platform win32 && proof test */*.t.js || t/test"
     }
 }
