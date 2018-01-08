@@ -20,12 +20,21 @@
     },
     "dependencies":
     {
+                            "docco":                        "0.7.0",
+                            "edify":                        "*",
+                            "edify.highlight":              "*",
+                            "edify.include":                "*",
+                            "edify.ls":                     "*",
+                            "edify.markdown":               "*",
+                            "edify.pug":                    "*",
+                            "less":                         "*",
+                            "serve":                        "1.4.0"
     },
     "devDependencies":
     {
     },
     "bin":
     {
-                            "wg": "wiseguy.bash"
+                            "wg":                           "wiseguy.bash"
     }
 }

@@ -76,6 +76,18 @@ endif
 
 all: $(root)/docs $(outputs)
 
+utility=$(WISEGUY_PATH)/node_modules/.bin
+
+utilities =$(utility)/docco
+utilities+=$(utility)/edify
+utilities+=$(utility)/serve
+utilities+=$(utility)/lessc
+
+$(utilities):
+	cd $(WISEGUY_PATH); \
+	yarn install --no-lockfile; \
+	cd node_modules && patch -p 1 < ../docco.js.patch;
+
 inspect:
 	@echo path=$(WISEGUY_PATH)\; project=$(WISEGUY_SUBPROJECT_NAME)\; root=$(root)\;
 
@@ -84,13 +96,6 @@ $(root)/docs:
 	origin=$$(git config --get remote.origin.url); \
 	echo "$$origin"; \
 	git clone -b gh-pages --recursive "$$origin" $(root)/docs;
-
-#	npm install serve@1.4.0
-
-$(root)/node_modules/.bin/istanbul:
-	cd $(root); \
-	mkdir -p node_modules; \
-	npm install istanbul;
 
 # Thoughts on how to capture a child pid.
 #
@@ -110,8 +115,8 @@ $(root)/node_modules/.bin/istanbul:
 # background,  if I where to allow myself a few pid files in the build
 # directory.
 up:
-	{ make -f $(wiseguy)/Makefile --no-print-directory serve & } && serve=$$!; \
-	make -f $(wiseguy)/Makefile --no-print-directory watch; \
+	{ make -f $(WISEGUY_PATH)/Makefile --no-print-directory serve & } && serve=$$!; \
+	make -f $(WISEGUY_PATH)/Makefile --no-print-directory watch; \
 	kill -TERM $$serve;
 
 down:
@@ -134,57 +139,55 @@ watch: all
 			touch .wiseguy/_watch; \
 			exit 0; \
 		else \
-			make -f "$(wiseguy)/Makefile" --no-print-directory all < /dev/null; \
+			make -f "$(WISEGUY_PATH)/Makefile" --no-print-directory all < /dev/null; \
 			osascript -e "$$CHROME_REFRESH"; \
 		fi \
 	done;
 
-$(docs)/css/%.css: $(docs)/css/%.less
-	lessc --include-path='$(WISEGUY_PATH)/css' $< > $@ || rm -f $@
+$(docs)/css/%.css: $(docs)/css/%.less $(utility)/lessc
+	$(utility)/lessc --include-path='$(WISEGUY_PATH)/css' $< > $@ || rm -f $@
 
 $(temp)/source/%.js.js: %.js
 	mkdir -p $(temp)/source
 	cp $< $@
 
-$(docco): $(sources)
+$(docco): $(sources) $(utility)/docco
 	echo $(docco) $(sources)
 	mkdir -p $(docs)/docco
-	docco -o $(docs)/docco -c $(WISEGUY_PATH)/docco.css $(temp)/source/*.js.js
+	$(utility)/docco -o $(docs)/docco -c $(WISEGUY_PATH)/docco.css $(temp)/source/*.js.js
 	sed -i '' -e 's/[[:space:]]*$$//' $(docs)/docco/*.js.html
 	sed -i '' -e 's/\.js\.js/.js/' $(docs)/docco/*.js.html
 
 $(docs)/index.html: $(docs)/index.md
 
-$(docs)/docco/index.html: $(WISEGUY_PATH)/docco.pug $(docco)
-	edify pug $$(edify ls $(docs)/docco) < $< > $@
+$(docs)/docco/index.html: $(WISEGUY_PATH)/docco.pug $(docco) $(utility)/edify
+	$(utility)/edify pug $$($(utility)/edify ls $(docs)/docco) < $< > $@
 
-$(docs)/%.html: $(docs)/pages/%.pug
+$(docs)/%.html: $(docs)/pages/%.pug $(utility)/edify
 	@echo generating $@
-	@(cd $(docs) && edify pug | \
-		edify include --select '.include' --type text | \
-	    edify markdown --select '.markdown' | \
-	    edify highlight --select '.lang-javascript' --language 'javascript') < $< > $@
+	@(cd $(docs) && $(utility)/edify pug | \
+		$(utility)/edify include --select '.include' --type text | \
+	    $(utility)/edify markdown --select '.markdown' | \
+	    $(utility)/edify highlight --select '.lang-javascript' --language 'javascript') < $< > $@
 
-$(docs)/diary.html: $(docs)/diary.md $(docs)/pages/diary.pug
+$(docs)/diary.html: $(docs)/diary.md $(docs)/pages/diary.pug $(utility)/edify
 	@echo generating $@
-	@(cd $(docs) && edify pug <(wg diary < diary.md | jq -s .) | \
-		edify include --select '.include' --type text | \
-	    edify markdown --select '.markdown' | \
-	    edify highlight --select '.lang-javascript' --language 'javascript' \
+	@(cd $(docs) && $(utility)/edify pug <(wg diary < diary.md | jq -s .) | \
+		$(utility)/edify include --select '.include' --type text | \
+	    $(utility)/edify markdown --select '.markdown' | \
+	    $(utility)/edify highlight --select '.lang-javascript' --language 'javascript' \
 		) < $(docs)/pages/diary.pug > $@
 
 $(root)/node_modules/.bin/yaml2json:
 	npm install yamljs
 
-$(docs)/interface.html: $(docs)/interface.yml $(wiseguy)/interface.pug $(root)/node_modules/.bin/yaml2json
-	(edify pug "$$(node_modules/.bin/yaml2json $<)" | \
-	    edify markdown --select '.markdown' | \
-	    edify highlight --select '.lang-javascript' --language 'javascript') < $(wiseguy)/interface.pug > $@
+$(docs)/interface.html: $(docs)/interface.yml $(wiseguy)/interface.pug $(root)/node_modules/.bin/yaml2json $(utility)/edify
+	($(utility)/edify pug "$$(node_modules/.bin/yaml2json $<)" | \
+	    $(utility)/edify markdown --select '.markdown' | \
+	    $(utility)/edify highlight --select '.lang-javascript' --language 'javascript') < $(wiseguy)/interface.pug > $@
 
 clean:
 	rm -rf $(outputs) $(docs)/index.html $(docs)/docco .wiseguy
 
-serve: all
-	(cd $(root)/docs && serve --no-less --port 4000)
-
-cover: $(root)/node_modules/.bin/istanbul all
+serve: all $(utility)/serve
+	(cd $(root)/docs && $(utility)/serve --no-less --port 4000)
