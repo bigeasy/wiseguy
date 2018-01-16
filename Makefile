@@ -86,7 +86,7 @@ utilities+=$(utility)/yaml2json
 
 $(utilities):
 	cd $(WISEGUY_PATH); \
-	yarn install --no-lockfile; \
+	npm install --no-save --no-package-lock; \
 	cd node_modules && patch -p 1 < ../docco.js.patch;
 
 inspect:
