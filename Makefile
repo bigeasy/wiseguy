@@ -82,6 +82,7 @@ utilities =$(utility)/docco
 utilities+=$(utility)/edify
 utilities+=$(utility)/serve
 utilities+=$(utility)/lessc
+utilities+=$(utility)/yaml2json
 
 $(utilities):
 	cd $(WISEGUY_PATH); \
@@ -178,13 +179,10 @@ $(docs)/diary.html: $(docs)/diary.md $(docs)/pages/diary.pug $(utility)/edify
 	    $(utility)/edify highlight --select '.lang-javascript' --language 'javascript' \
 		) < $(docs)/pages/diary.pug > $@
 
-$(root)/node_modules/.bin/yaml2json:
-	npm install yamljs
-
-$(docs)/interface.html: $(docs)/interface.yml $(wiseguy)/interface.pug $(root)/node_modules/.bin/yaml2json $(utility)/edify
-	($(utility)/edify pug "$$(node_modules/.bin/yaml2json $<)" | \
+$(docs)/interface.html: $(docs)/interface.yml $(WISEGUY_PATH)/interface.pug $(utility)/yaml2json $(utility)/edify
+	($(utility)/edify pug "$$($(utility)/yaml2json $<)" | \
 	    $(utility)/edify markdown --select '.markdown' | \
-	    $(utility)/edify highlight --select '.lang-javascript' --language 'javascript') < $(wiseguy)/interface.pug > $@
+	    $(utility)/edify highlight --select '.lang-javascript' --language 'javascript') < $(WISEGUY_PATH)/interface.pug > $@
 
 clean:
 	rm -rf $(outputs) $(docs)/index.html $(docs)/docco .wiseguy
