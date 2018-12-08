@@ -76,6 +76,8 @@ endif
 
 all: $(root)/docs $(outputs)
 
+.INTERMEDIATE: $(sources)
+
 utility=$(WISEGUY_PATH)/node_modules/.bin
 
 utilities =$(utility)/docco
