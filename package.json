@@ -28,7 +28,7 @@
                             "edify.markdown":               "*",
                             "edify.pug":                    "*",
                             "less":                         "*",
-                            "serve":                        "1.4.0"
+                            "serve":                        "10.1.1"
     },
     "devDependencies":
     {
