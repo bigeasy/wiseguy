@@ -1,6 +1,6 @@
 {
     "name":                 "wiseguy",
-    "version":              "0.0.9",
+    "version":              "0.0.10",
     "description":
 
       "Development utilities for Node.js written in `bash`.",
