@@ -24,7 +24,7 @@
                             "edify":                        "*",
                             "edify.highlight":              "*",
                             "edify.include":                "*",
-                            "edify.ls":                     "*",
+                            "edify.ls":                     "0.0.4",
                             "edify.markdown":               "*",
                             "edify.pug":                    "*",
                             "less":                         "*",
