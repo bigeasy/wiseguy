@@ -190,4 +190,4 @@ clean:
 	rm -rf $(outputs) $(docs)/index.html $(docs)/docco .wiseguy
 
 serve: all $(utility)/serve
-	(cd $(root)/docs && $(utility)/serve --no-less --port 4000)
+	(cd $(root)/docs && $(utility)/serve --listen 4000)
