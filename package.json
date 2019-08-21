@@ -20,7 +20,7 @@
     },
     "dependencies":
     {
-                            "docco":                        "0.8.0",
+                            "docco":                        "0.7.0",
                             "edify":                        "0.1.x",
                             "edify.highlight":              "0.1.x",
                             "edify.include":                "0.1.x",
