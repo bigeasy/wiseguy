@@ -20,15 +20,15 @@
     },
     "dependencies":
     {
-                            "docco":                        "0.7.0",
-                            "edify":                        "*",
-                            "edify.highlight":              "*",
-                            "edify.include":                "*",
-                            "edify.ls":                     "0.0.x",
-                            "edify.markdown":               "*",
-                            "edify.pug":                    "*",
-                            "less":                         "*",
-                            "serve":                        "10.1.1"
+                            "docco":                        "0.8.0",
+                            "edify":                        "0.1.x",
+                            "edify.highlight":              "0.1.x",
+                            "edify.include":                "0.1.x",
+                            "edify.ls":                     "0.1.x",
+                            "edify.markdown":               "0.1.x",
+                            "edify.pug":                    "0.1.x",
+                            "less":                         "3.9.x",
+                            "serve":                        "11.1.0"
     },
     "devDependencies":
     {
