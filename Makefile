@@ -132,14 +132,13 @@ down:
 #	echo -> $(serve)
 
 watch: all
-	cd $(root); \
-	mkdir -p .wiseguy; \
-	touch .wiseguy/_watch; \
-	fswatch --exclude '.' --include '../.wiseguy/_watch$$' --include '\.yml$$' --include '\.pug$$' --include '\.less$$' --include '\.md$$' --include '\.js$$' docs/*.yml node_modules/wiseguy/*.pug docs/pages docs/css $(javascript) docs/*.md Makefile | while read line; \
+	mkdir -p $(root)/.wiseguy; \
+	touch $(root)/.wiseguy/_watch; \
+	fswatch --exclude '.' --include $(root)'/.wiseguy/_watch$$' --include '\.yml$$' --include '\.pug$$' --include '\.less$$' --include '\.md$$' --include '\.js$$' docs/*.yml node_modules/wiseguy/*.pug docs/pages docs/css $(javascript) docs/*.md Makefile | while read line; \
 	do \
 		echo OUT-OF-DATE: $$line; \
 		if [[ $$line == *_watch ]]; then \
-			touch .wiseguy/_watch; \
+			touch $(root)/.wiseguy/_watch; \
 			exit 0; \
 		else \
 			make -f "$(WISEGUY_PATH)/Makefile" --no-print-directory all < /dev/null; \
