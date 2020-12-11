@@ -1,40 +1,32 @@
 {
-    "name":                 "wiseguy",
-    "version":              "0.0.11",
-    "description":
-
-      "Development utilities for Node.js written in `bash`.",
-
-    "keywords":
-    [
-                            "comparator", "sort"
-    ],
-    "author":               "Alan Gutierrez <alan@prettyrobots.com>",
-    "homepage":             "https://github.com/bigeasy/wiseguy",
-    "bugs":                 "https://github.com/bigeasy/wiseguy/issues",
-    "license":              "MIT",
-    "repository":
-    {
-                            "type": "git",
-                            "url": "bigeasy/wiseguy"
-    },
-    "dependencies":
-    {
-                            "docco":                        "0.7.0",
-                            "edify":                        "0.1.x",
-                            "edify.highlight":              "0.1.x",
-                            "edify.include":                "0.1.x",
-                            "edify.ls":                     "0.1.x",
-                            "edify.markdown":               "0.1.x",
-                            "edify.pug":                    "0.1.x",
-                            "less":                         "3.9.x",
-                            "serve":                        "11.1.0"
-    },
-    "devDependencies":
-    {
-    },
-    "bin":
-    {
-                            "wg":                           "wiseguy.bash"
-    }
+          "name": "wiseguy",
+          "version": "0.0.11",
+          "description": "Development utilities for Node.js written in `bash`.",
+          "keywords": [
+                    "comparator",
+                    "sort"
+          ],
+          "author": "Alan Gutierrez <alan@prettyrobots.com>",
+          "homepage": "https://github.com/bigeasy/wiseguy",
+          "bugs": "https://github.com/bigeasy/wiseguy/issues",
+          "license": "MIT",
+          "repository": {
+                    "type": "git",
+                    "url": "bigeasy/wiseguy"
+          },
+          "dependencies": {
+                    "docco": "0.7.0",
+                    "edify": "0.1.x",
+                    "edify.highlight": "0.1.x",
+                    "edify.include": "0.1.x",
+                    "edify.ls": "0.1.x",
+                    "edify.markdown": "0.1.x",
+                    "edify.pug": "0.1.x",
+                    "less": "3.9.x",
+                    "serve": "11.1.0"
+          },
+          "devDependencies": {},
+          "bin": {
+                    "wg": "wiseguy.bash"
+          }
 }
