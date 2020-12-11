@@ -57,13 +57,11 @@ else
 endif
 
 javascript := $(filter-out _%, $(wildcard *.js))
+javascript += $(wildcard test/readme.t.js)
 sources := $(patsubst %.js,$(temp)/source/%.js.js,$(javascript))
 styles := $(patsubst $(docs)/css/%.less,$(docs)/css/%.css,$(wildcard $(docs)/css/*.less))
 docco := $(patsubst $(temp)/source/%.js.js,$(docs)/docco/%.js.html,$(sources))
-pages :=
-ifneq (,$(docco))
-pages += $(docs)/docco/index.html
-endif
+pages := $(patsubst $(docs)/html/%.html,$(docs)/%.html,$(wildcard $(docs)/html/*.html))
 outputs := $(docco) $(docs)/index.html $(pages) $(styles)
 
 ifneq ("$(wildcard $(docs)/interface.yml)","")
@@ -134,7 +132,7 @@ down:
 watch: all
 	mkdir -p $(root)/.wiseguy; \
 	touch $(root)/.wiseguy/_watch; \
-	fswatch --exclude '.' --include $(root)'/.wiseguy/_watch$$' --include '\.yml$$' --include '\.pug$$' --include '\.less$$' --include '\.md$$' --include '\.js$$' docs/*.yml node_modules/wiseguy/*.pug docs/pages docs/css $(javascript) docs/*.md Makefile | while read line; \
+	fswatch --exclude '.' --include $(root)'/.wiseguy/_watch$$' --include '\.html$$' --include '\.yml$$' --include '\.pug$$' --include '\.less$$' --include '\.md$$' --include '\.js$$' docs/*.yml node_modules/wiseguy/*.pug docs/pages docs/css docs/html/*.html $(javascript) docs/*.md Makefile | while read line; \
 	do \
 		echo OUT-OF-DATE: $$line; \
 		if [[ $$line == *_watch ]]; then \
@@ -150,27 +148,25 @@ $(docs)/css/%.css: $(docs)/css/%.less $(utility)/lessc
 	$(utility)/lessc --include-path='$(WISEGUY_PATH)/css' $< > $@ || rm -f $@
 
 $(temp)/source/%.js.js: %.js
-	mkdir -p $(temp)/source
+	mkdir -p $(temp)/source/$(dir $<)
 	cp $< $@
 
 $(docco): $(sources) $(utility)/docco
 	echo $(docco) $(sources)
 	mkdir -p $(docs)/docco
-	$(utility)/docco -o $(docs)/docco -c $(WISEGUY_PATH)/docco.css $(temp)/source/*.js.js
+	$(utility)/docco -o $(docs)/docco -c $(WISEGUY_PATH)/docco.css $(sources)
 	sed -i '' -e 's/[[:space:]]*$$//' $(docs)/docco/*.js.html
 	sed -i '' -e 's/\.js\.js/.js/' $(docs)/docco/*.js.html
-
-$(docs)/index.html: $(docs)/index.md
 
 $(docs)/docco/index.html: $(WISEGUY_PATH)/docco.pug $(docco) $(utility)/edify
 	$(utility)/edify pug $$($(utility)/edify ls $(docs)/docco) < $< > $@
 
-$(docs)/%.html: $(docs)/pages/%.pug $(utility)/edify
+$(docs)/%.html: $(docs)/html/%.html $(utility)/edify
 	@echo generating $@
-	@(cd $(docs) && $(utility)/edify pug | \
+	(cd $(docs) && \
 		$(utility)/edify include --select '.include' --type text | \
 	    $(utility)/edify markdown --select '.markdown' | \
-	    $(utility)/edify highlight --select '.lang-javascript' --language 'javascript') < $< > $@
+	    $(utility)/edify highlight --select '.language-javascript' --language 'javascript') < $< > $@
 
 $(docs)/diary.html: $(docs)/diary.md $(docs)/pages/diary.pug $(utility)/edify
 	@echo generating $@
