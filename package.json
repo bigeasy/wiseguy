@@ -19,7 +19,7 @@
                     "edify": "0.2.0",
                     "edify.highlight": "0.1.x",
                     "edify.include": "0.1.x",
-                    "edify.ls": "0.1.x",
+                    "edify.ls": "0.2.0",
                     "edify.markdown": "0.1.x",
                     "edify.pug": "0.1.x",
                     "less": "3.9.x",
