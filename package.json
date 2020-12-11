@@ -21,7 +21,7 @@
                     "edify.include": "0.1.x",
                     "edify.ls": "0.2.0",
                     "edify.markdown": "0.2.0",
-                    "edify.pug": "0.1.x",
+                    "edify.pug": "0.2.0",
                     "less": "3.9.x",
                     "serve": "11.1.0"
           },
