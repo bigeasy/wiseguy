@@ -20,7 +20,7 @@
                     "edify.highlight": "0.3.0",
                     "edify.include": "0.2.1",
                     "edify.ls": "0.2.2",
-                    "edify.markdown": "0.2.0",
+                    "edify.markdown": "0.2.1",
                     "edify.pug": "0.2.0",
                     "less": "3.9.x",
                     "serve": "11.3.2"
